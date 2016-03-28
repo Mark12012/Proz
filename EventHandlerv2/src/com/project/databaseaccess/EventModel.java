@@ -4,6 +4,30 @@ import java.sql.Date;
 
 public class EventModel
 {
+	public EventModel()
+	{
+		this.user_id = 0;
+		this.place = null;
+		this.description = null;
+		this.eventdate = null;
+		this.title = null;
+		this.eventcategory_id = 0;
+	}
+	
+	public EventModel(int user_id, String place,String description,Date eventdate,String title,int  eventcategory_id)
+	{
+		this.user_id = user_id;
+		this.place = place;
+		this.description = description;
+		this.eventdate = eventdate;
+		this.title = title;
+		this.eventcategory_id = eventcategory_id;
+	}
+	
+	public EventModel(int user_id, String place,String description,Date eventdate,String title)
+	{
+		this(user_id,place,description,eventdate,title,1);
+	}
 
 	public int getEvent_id()
 	{

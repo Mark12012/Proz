@@ -86,7 +86,7 @@ public class CalendarOnly extends JPanel {
 						cmd[0] = Integer.parseInt(e.getActionCommand());
 						cmd[1] = cal.get(Calendar.MONTH);
 						cmd[2] = cal.get(Calendar.YEAR);
-						userApp.eventsOfTheDay(cmd);
+						//userApp.eventsOfTheDay(cmd);
 						//System.out.println(cmd);
 						//System.out.println(cal.get(Calendar.MONTH));
 					}});

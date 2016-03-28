@@ -1,10 +1,10 @@
 package com.project.databaseaccess;
 
 import java.sql.*;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class DataBaseAccessor implements Handable
@@ -66,6 +66,14 @@ public class DataBaseAccessor implements Handable
 				event.setTitle(recordlist.getString("title"));
 				event.setPlace(recordlist.getString("place"));
 				event.setDescription(recordlist.getString("description"));
+				
+				
+				Timestamp timestamp = recordlist.getTimestamp("eventdate");
+				if (timestamp != null)
+				    System.out.println(timestamp);
+				
+				
+				
 				event.setEventdate(recordlist.getDate("eventdate"));
 				
 				allEvents.add(event);
@@ -148,7 +156,7 @@ public class DataBaseAccessor implements Handable
 	}
 	
 	
-	public List<EventModel> findEventsInThisWeek(int user_id)
+	public List<EventModel> findEventsInNextWeek(int user_id)
 	{
 		List<EventModel> weekEvents = new ArrayList<>();
 		
@@ -193,12 +201,12 @@ public class DataBaseAccessor implements Handable
 		
 		return weekEvents;	
 	}
-	
-	public List<EventModel> findEventsInCertainDay(int user_id, Calendar date)
+	public List<EventModel> findEventsInCertainDay(int user_id,int day, int month, int year)
 	{
 		List<EventModel> dayEvents = new ArrayList<>();
-		SimpleDateFormat dateOnly = new SimpleDateFormat("yyyy-MM-dd");
-		String query = "SELECT * FROM events WHERE user_id = ? AND WHERE eventdate = ?";
+		
+		String query = "SELECT * FROM events WHERE user_id = ? AND DAY(eventdate) = ? " + 
+		"AND MONTH(eventdate) = ? AND YEAR(eventdate) = ?";
 		Connection c = null;
 		
 		try
@@ -206,7 +214,9 @@ public class DataBaseAccessor implements Handable
 			c = createConnection();
 			PreparedStatement statement = c.prepareStatement(query);
 			statement.setInt(1, user_id);
-			statement.setString(2, dateOnly.format(date.getTime()));
+			statement.setInt(2, day);
+			statement.setInt(3, month);
+			statement.setInt(4, year);
 			ResultSet recordlist = statement.executeQuery();
 			
 			while(recordlist.next())
@@ -235,12 +245,12 @@ public class DataBaseAccessor implements Handable
 		return dayEvents;
 	}
 	
-	public List<EventModel> findEventsInCertainMonth(int user_id,int MONTH)
+	public List<EventModel> findEventsInCertainMonth(int user_id,int month, int year)
 	{
 		List<EventModel> monthEvents = new ArrayList<>();
 		
-		String query = "SELECT * FROM events WHERE user_id = ?" +
-		" AND MONTH(eventdate) = ?";
+		String query = "SELECT * FROM events WHERE user_id = ? AND MONTH(eventdate) = ? " + 
+		"AND YEAR(eventdate) = ?";
 		Connection c = null;
 		
 		try
@@ -248,7 +258,8 @@ public class DataBaseAccessor implements Handable
 			c = createConnection();
 			PreparedStatement statement = c.prepareStatement(query);
 			statement.setInt(1, user_id);
-			statement.setInt(2, MONTH);
+			statement.setInt(2, month);
+			statement.setInt(3, year);
 			ResultSet recordlist = statement.executeQuery();
 			
 			while(recordlist.next())
@@ -261,7 +272,6 @@ public class DataBaseAccessor implements Handable
 				event.setPlace(recordlist.getString("place"));
 				event.setDescription(recordlist.getString("description"));
 				event.setEventdate(recordlist.getDate("eventdate"));
-				
 				monthEvents.add(event);
 			}
 		}
@@ -275,5 +285,46 @@ public class DataBaseAccessor implements Handable
 		}
 		
 		return monthEvents;
+	}
+	
+	public List<EventModel> findEventsInCertainYear(int user_id,int year)
+	{
+		List<EventModel> yearEvents = new ArrayList<>();
+		
+		String query = "SELECT * FROM events WHERE user_id = ? AND YEAR(eventdate) = ?";
+		Connection c = null;
+		
+		try
+		{
+			c = createConnection();
+			PreparedStatement statement = c.prepareStatement(query);
+			statement.setInt(1, user_id);
+			statement.setInt(2, year);
+			ResultSet recordlist = statement.executeQuery();
+			
+			while(recordlist.next())
+			{
+				EventModel event = new EventModel();
+				event.setEvent_id(recordlist.getInt("event_id"));
+				event.setUser_id(recordlist.getInt("user_id"));
+				event.setEventcategory_id(recordlist.getInt("eventcategory_id"));
+				event.setTitle(recordlist.getString("title"));
+				event.setPlace(recordlist.getString("place"));
+				event.setDescription(recordlist.getString("description"));
+				event.setEventdate(recordlist.getDate("eventdate"));
+				
+				yearEvents.add(event);
+			}
+		}
+		catch(SQLException e)
+		{
+			System.err.println("Pobieranie wydarzeñ zakoñczy³o siê niepowodzeniem.");
+		}
+		finally
+		{
+			endConnection(c);
+		}
+		
+		return yearEvents;
 	}
 }
